@@ -19,3 +19,18 @@ export type UserLogin = {
 }
 
 export type UserOutput = User
+
+// CRUD
+export type UserCreate = {
+    name: string
+    email: string
+    password: string
+    role?: UserRole
+}
+
+export type UserUpdate = {
+    name?: string
+    email?: string
+    password?: string
+    role?: UserRole
+}
