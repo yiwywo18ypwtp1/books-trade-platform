@@ -1,0 +1,67 @@
+# =====================
+# ENV
+# =====================
+.env*
+!.env.example
+
+# =====================
+# NODE
+# =====================
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# =====================
+# BUILD / OUTPUT
+# =====================
+dist/
+build/
+out/
+
+# =====================
+# NEXT.js
+# =====================
+frontend/.next/
+frontend/out/
+
+# =====================
+# BACKEND
+# =====================
+backend/dist/
+
+# =====================
+# CACHE / TEMP
+# =====================
+.cache/
+*.tsbuildinfo
+
+# =====================
+# TEST / COVERAGE
+# =====================
+coverage/
+
+# =====================
+# LOGS
+# =====================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =====================
+# SYSTEM
+# =====================
+.DS_Store
+*.pem
+
+# =====================
+# IDE / LOCAL
+# =====================
+.vscode/
+.idea/
+
+# =====================
+# OTHER
+# =====================
+*.http
