@@ -110,7 +110,7 @@ export const exchangeRequest = async (id: number, userId: number, message?: stri
         }
     });
 
-    const senderBooks = await prisma.book.findMany({ where: { id: userId } });
+    const senderBooks = await prisma.book.findMany({ where: { ownerId: userId } });
 
     if (!book) throw new HttpError("Book not found", 404);
 
