@@ -4,10 +4,7 @@ import { authMiddleware } from "../../middlewares/JWTAuth";
 
 const router = Router();
 
-
 router.use(authMiddleware);
-
-router.get("/me", authMiddleware, controller.getMyBooks);
 
 router.get("/", controller.getBooks);
 router.post("/", controller.createBook);
