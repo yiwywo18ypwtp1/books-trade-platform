@@ -33,6 +33,7 @@ export const getBook = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
         const result = await service.getOne(id);
+
         res.json(result);
     } catch (err: any) {
         res.status(err.status || 500).json({ message: err.message });
@@ -85,3 +86,22 @@ export const getMyBooks = async (req: Request, res: Response) => {
         res.status(err.status || 500).json({ message: err.message });
     }
 };
+
+export const sendRequest = async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+
+        const user = (req as any).user;
+        const message = req.body.message
+
+        const result = await service.exchangeRequest(
+            id,
+            user.id,
+            message
+        );
+
+        res.json(result);
+    } catch (err: any) {
+        res.status(err.status || 500).json({ message: err.message });
+    }
+}

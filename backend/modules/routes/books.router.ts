@@ -12,4 +12,6 @@ router.get("/:id", controller.getBook);
 router.patch("/:id", controller.updateBook);
 router.delete("/:id", controller.deleteBook);
 
+router.post("/:id/send-request", controller.sendRequest);
+
 export default router;

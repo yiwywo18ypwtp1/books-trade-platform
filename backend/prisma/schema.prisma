@@ -64,6 +64,7 @@ model ExchangeRequest {
   bookId     Int
 
   message String?
+  status  RequestStatus @default(PENDING)
 
   sender   User @relation("SentRequests", fields: [senderId], references: [id], onDelete: Cascade)
   receiver User @relation("ReceivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
