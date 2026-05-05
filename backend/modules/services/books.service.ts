@@ -139,7 +139,7 @@ export const exchangeRequest = async (id: number, userId: number, message?: stri
         <h2 style="margin-top:0;">📚 Book Exchange Request</h2>
         
         <p>
-          <b>${sender.name}</b> wants to exchange books with you.
+          <b>${sender.name} (${sender.email})</b> wants to exchange books with you.
         </p>
     
         <p style="margin:15px 0;">
