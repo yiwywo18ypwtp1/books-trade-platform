@@ -2,7 +2,7 @@ export type Book = {
     id: number
     name: string
     author: string
-    photoUrl?: string
+    photoUrl?: string | null
 }
 
 export type BookCreate = {

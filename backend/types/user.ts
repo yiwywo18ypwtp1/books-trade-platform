@@ -7,6 +7,12 @@ export type User = {
     role: UserRole
 }
 
+export type UserPublic = {
+    id: number
+    name: string
+    email: string
+}
+
 export type UserSignup = {
     name: string
     email: string
