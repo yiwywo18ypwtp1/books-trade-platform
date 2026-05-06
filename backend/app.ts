@@ -19,7 +19,10 @@ app.use(cors({
         "https://books-trade-platform-o2eo.vercel.app"
     ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
 app.use(express.json());
 app.use(cookieParser());
 
