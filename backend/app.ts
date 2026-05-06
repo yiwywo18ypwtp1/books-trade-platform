@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 5001;
 app.use(cors({
     origin: [
         "http://localhost:3000",
-        "https://books-trade-platform-o2eo.vercel.app"
+        "https://books-trade-platform-front.vercel.app/"
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
