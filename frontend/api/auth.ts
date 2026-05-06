@@ -16,7 +16,7 @@ export const signup = async (payload: {
     email: string;
     password: string;
 }) => {
-    const { data } = await api.post("/auth/register", payload);
+    const { data } = await api.post("/auth/signup", payload);
     return data;
 };
 
