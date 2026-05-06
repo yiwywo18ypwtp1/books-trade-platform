@@ -21,7 +21,15 @@ export const login = async (req: Request<UserLogin>, res: Response) => {
 
     try {
         const result = await authService.login({ email, password });
-        res.json(result);
+
+        res.cookie("token", result.token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 1000 * 60 * 60
+        });
+
+        res.json({ user: result.user });
 
     } catch (err: any) {
         res.status(err.status || 500).json({
