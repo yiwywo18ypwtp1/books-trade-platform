@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from "react";
 
-import { getBooks } from "@/api/books";
+import { deleteBook, getBooks, updateBook } from "@/api/books";
 import { Book } from "@/types/book";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useAuth } from "@/hooks/useAuth";
-import BookCard from "@/components/BookCard";
+import BookList from "@/components/BooksList";
+import EditBookModal from "@/components/EditBookModal";
 
 export default function BooksPage() {
-    const { user, loading, logout } = useAuth()
+    const { user } = useAuth()
 
     const [books, setBooks] = useState<Book[]>([]);
+    const [editingBook, setEditingBook] = useState<Book | null>(null);
 
     const [page, setPage] = useState<number>(1);
     const [total, setTotal] = useState<number>(0);
@@ -19,25 +21,32 @@ export default function BooksPage() {
 
     const debouncedSearch = useDebounce(search, 400);
 
-    const limit = 8;
+    const limit = 12;
+
+    const fetchBooks = async () => {
+        const res = await getBooks(page, limit, debouncedSearch);
+
+        setBooks(res.data);
+        setTotal(res.meta.total);
+    };
 
     useEffect(() => {
-        if (!user && !loading) {
-            logout();
-            return;
-        }
-
-        const fetchBooks = async () => {
-            const res = await getBooks(page, limit, debouncedSearch);
-
-            setBooks(res.data);
-            setTotal(res.meta.total);
-        };
-
         fetchBooks();
     }, [page, limit, debouncedSearch]);
 
     const totalPages = Math.ceil(total / limit);
+
+    const handleDelete = async (id: number) => {
+        setBooks((prev) => prev.filter((b) => b.id !== id));
+
+        try {
+            await deleteBook(id);
+        } catch (err) {
+            console.error(err);
+
+            await fetchBooks();
+        }
+    };
 
     return (
         <div className="p-5 mx-auto min-h-screen flex flex-col">
@@ -54,11 +63,12 @@ export default function BooksPage() {
                     className="border border-gray-300 px-3 py-2 rounded-full mb-4 w-full transition outline-0 focus:border-violet-400"
                 />
 
-                <div className="grid grid-cols-6 grid-rows-2 gap-4 flex-1">
-                    {books.map((b) => (
-                        <BookCard key={b.id} book={b} isOwner={b.ownerId === user?.id} />
-                    ))}
-                </div>
+                <BookList
+                    books={books}
+                    userId={user?.id}
+                    onEdit={(b) => setEditingBook(b)}
+                    onDelete={handleDelete}
+                />
             </div>
 
             <div className="flex gap-2 flex-wrap">
@@ -75,6 +85,17 @@ export default function BooksPage() {
                     </button>
                 ))}
             </div>
+
+            {editingBook && (
+                <EditBookModal
+                    book={editingBook}
+                    onClose={() => setEditingBook(null)}
+                    onSave={async (data) => {
+                        await updateBook(editingBook.id, data);
+                        await fetchBooks();
+                    }}
+                />
+            )}
         </div>
     );
 }

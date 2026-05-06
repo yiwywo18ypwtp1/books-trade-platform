@@ -27,6 +27,6 @@ export const logout = () => {
 };
 
 export const getMe = async () => {
-    const { data } = await api.get<User>("/auth/me");
-    return data;
+    const { data } = await api.get<{ user: User }>("/auth/me");
+    return data.user;
 };

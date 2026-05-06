@@ -28,8 +28,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 const me = await authApi.getMe();
 
                 setUser(me);
-            } catch {
-                setUser(null);
+            } catch (err: any) {
+                if (err?.response?.status === 401) {
+                    setUser(null);
+                } else {
+                    console.error("getMe error:", err);
+                }
             } finally {
                 setLoading(false);
             }

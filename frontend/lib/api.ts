@@ -28,12 +28,12 @@ api.interceptors.response.use(
     (res) => res,
     (err) => {
         if (err.response?.status === 401) {
-            localStorage.removeItem("token");
+            const url = err.config?.url;
 
-            if (typeof window !== "undefined") {
-                const currentPath = window.location.pathname;
+            if (!url?.includes("/auth/me")) {
+                localStorage.removeItem("token");
 
-                if (currentPath !== "/auth") {
+                if (typeof window !== "undefined") {
                     window.location.href = "/auth";
                 }
             }

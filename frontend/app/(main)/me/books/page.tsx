@@ -2,40 +2,62 @@
 
 import { useEffect, useState } from "react";
 
-import { getMyBooks } from "@/api/books";
+import { deleteBook, getMyBooks, updateBook } from "@/api/books";
 import { Book } from "@/types/book";
 import { useAuth } from "@/hooks/useAuth";
-import BookCard from "@/components/BookCard";
+import BookList from "@/components/BooksList";
+import EditBookModal from "@/components/EditBookModal";
 
 export default function MyBooks() {
-    const { user, loading, logout } = useAuth();
+    const { user, loading } = useAuth();
 
     const [books, setBooks] = useState<Book[]>([]);
+    const [editingBook, setEditingBook] = useState<Book | null>(null);
+
+    const fetchBooks = async () => {
+        const res = await getMyBooks();
+
+        setBooks(res);
+    };
 
     useEffect(() => {
-        if (!user && !loading) {
-            logout();
-            return;
-        }
-
-        const fetchBooks = async () => {
-            const res = await getMyBooks();
-
-            setBooks(res);
-        };
-
+        if (!user) return;
         fetchBooks();
-    }, []);
+    }, [loading, user]);
+
+    const handleDelete = async (id: number) => {
+        setBooks((prev) => prev.filter((b) => b.id !== id));
+
+        try {
+            await deleteBook(id);
+        } catch (err) {
+            console.error(err);
+
+            await fetchBooks();
+        }
+    };
 
     return (
         <div className="p-5 w-full mx-auto h-full flex flex-col">
             <h1 className="text-2xl font-semibold mb-5">📚 My books</h1>
 
-            <div className="grid grid-cols-5 grid-rows-2 gap-4 flex-1">
-                {books.map((b) => (
-                    <BookCard key={b.id} book={b} isOwner={b.ownerId === user?.id} />
-                ))}
-            </div>
+            <BookList
+                books={books}
+                userId={user?.id}
+                onEdit={(b) => setEditingBook(b)}
+                onDelete={handleDelete}
+            />
+
+            {editingBook && (
+                <EditBookModal
+                    book={editingBook}
+                    onClose={() => setEditingBook(null)}
+                    onSave={async (data) => {
+                        await updateBook(editingBook.id, data);
+                        await fetchBooks();
+                    }}
+                />
+            )}
         </div>
     );
 }

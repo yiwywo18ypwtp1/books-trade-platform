@@ -22,6 +22,12 @@ export const createBook = async (payload: { name: string; author: string; photoU
     return data;
 };
 
+export const updateBook = async (id: number, payload: { name?: string; author?: string; photoUrl?: string }): Promise<Book> => {
+    const { data } = await api.patch<Book>(`/books/${id}`, payload);
+
+    return data;
+};
+
 export const deleteBook = async (id: number) => {
     const { data } = await api.delete(`/books/${id}`);
 
