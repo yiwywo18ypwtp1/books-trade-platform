@@ -10,18 +10,7 @@ if (!API_URL) {
 
 export const api = axios.create({
     baseURL: API_URL,
-});
-
-api.interceptors.request.use((config) => {
-    if (typeof window !== "undefined") {
-        const token = localStorage.getItem("token");
-
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-    }
-
-    return config;
+    withCredentials: true,
 });
 
 api.interceptors.response.use(
@@ -31,8 +20,6 @@ api.interceptors.response.use(
             const url = err.config?.url;
 
             if (!url?.includes("/auth/me")) {
-                localStorage.removeItem("token");
-
                 if (typeof window !== "undefined") {
                     window.location.href = "/auth";
                 }

@@ -1,6 +1,9 @@
+"use client"
+
 import { Trash, Pencil } from "lucide-react";
 
 import { Book } from "@/types/book";
+import Link from "next/link";
 
 type CardProps = {
     book: Book;
@@ -11,7 +14,10 @@ type CardProps = {
 
 export default function BookCard({ book, isOwner, onEdit, onDelete }: CardProps) {
     return (
-        <div className="h-full flex flex-col justify-between border rounded-lg p-3 bg-white hover:shadow-md transition">
+        <Link
+            href={`/books/${book.id}`}
+            className="h-full flex flex-col justify-between border rounded-lg p-3 bg-white hover:shadow-md transition"
+        >
             <img
                 src={book.photoUrl || "https://via.placeholder.com/150"}
                 className="w-full flex-1 object-cover rounded mb-2"
@@ -24,7 +30,11 @@ export default function BookCard({ book, isOwner, onEdit, onDelete }: CardProps)
                 {isOwner && (
                     <div className="flex gap-2 mt-2">
                         <button
-                            onClick={() => onEdit(book)}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onEdit(book);
+                            }}
                             className="
                             text-violet-400 bg-violet-100 border border-violet-400 w-1/2 py-1 rounded flex items-center justify-center
                             hover:bg-violet-200 transition cursor-pointer
@@ -32,7 +42,11 @@ export default function BookCard({ book, isOwner, onEdit, onDelete }: CardProps)
                             <Pencil className="text-violet-400" />
                         </button>
                         <button
-                            onClick={() => onDelete(book.id)}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onDelete(book.id)
+                            }}
                             className="
                             text-red-400 bg-red-100 border border-red-400 w-1/2 py-1 rounded flex items-center justify-center
                             hover:bg-red-200 transition cursor-pointer
@@ -42,6 +56,6 @@ export default function BookCard({ book, isOwner, onEdit, onDelete }: CardProps)
                     </div>
                 )}
             </div>
-        </div>
+        </Link>
     );
 }

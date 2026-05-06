@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import usersRouter from "./modules/routes/users.router"
 
@@ -12,8 +13,12 @@ import booksRouter from "./modules/routes/books.router"
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+}));
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/admin/users", usersRouter)
 

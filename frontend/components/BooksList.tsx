@@ -1,3 +1,5 @@
+"use client"
+
 import { Book } from "@/types/book";
 import BookCard from "./BookCard";
 
@@ -8,7 +10,7 @@ type Props = {
     userId?: number;
 };
 
-export default function BookList({ books, onEdit, onDelete, userId }: Props) {
+export const BookList = ({ books, onEdit, onDelete, userId }: Props) => {
     return (
         <div className="grid grid-cols-6 grid-rows-2 gap-4 flex-1 overflow-hidden">
             {books.map((b) => (
@@ -23,3 +25,5 @@ export default function BookList({ books, onEdit, onDelete, userId }: Props) {
         </div>
     );
 }
+
+export default BookList;

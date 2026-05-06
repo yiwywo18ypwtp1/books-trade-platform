@@ -13,7 +13,7 @@ type Props = {
     }) => Promise<void>;
 };
 
-export default function EditBookModal({ book, onClose, onSave }: Props) {
+const EditBookModal = ({ book, onClose, onSave }: Props) => {
     const [name, setName] = useState(book.name);
     const [author, setAuthor] = useState(book.author);
     const [photoUrl, setPhotoUrl] = useState(book.photoUrl ?? "");
@@ -90,3 +90,5 @@ export default function EditBookModal({ book, onClose, onSave }: Props) {
         </div>
     );
 }
+
+export default EditBookModal;

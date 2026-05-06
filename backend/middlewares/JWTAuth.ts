@@ -31,29 +31,17 @@ export const authMiddleware = (
     res: Response,
     next: NextFunction
 ) => {
-    const authHeader = req.headers.authorization
-
-    if (!authHeader) {
-        throw new HttpError("No token provided", 401);
-    }
-
-    const token = authHeader.split(" ")[1]
+    const token = req.cookies.token;
 
     if (!token) {
-        const err = new Error("Invalid token format") as any;
-        err.status = 401;
-        throw err;
-
-        throw new HttpError("Invalid token", 401);
+        throw new HttpError("No token provided", 401);
     }
 
     try {
         const decoded = jwt.verify(token, secretKey);
-        (req as any).user = decoded
-
-        next()
-    } catch (err: any) {
-        err.status = 401;
-        throw err;
+        (req as any).user = decoded;
+        next();
+    } catch (err) {
+        throw new HttpError("Invalid token", 401);
     }
 }

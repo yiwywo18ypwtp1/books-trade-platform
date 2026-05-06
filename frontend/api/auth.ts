@@ -5,7 +5,7 @@ export const login = async (payload: { email: string, password: string }) => {
     const { data } = await api.post<{ user: User; token: string; }>("/auth/login", payload);
 
     if (typeof window !== "undefined") {
-        localStorage.setItem("token", data.token);
+        document.cookie = `token=${data.token}; path=/`;
     }
 
     return data;
@@ -22,7 +22,7 @@ export const signup = async (payload: {
 
 export const logout = () => {
     if (typeof window !== "undefined") {
-        localStorage.removeItem("token");
+        document.cookie = "token=; Max-Age=0; path=/";
     }
 };
 
