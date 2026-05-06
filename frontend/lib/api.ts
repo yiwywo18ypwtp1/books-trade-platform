@@ -23,3 +23,22 @@ api.interceptors.request.use((config) => {
 
     return config;
 });
+
+api.interceptors.response.use(
+    (res) => res,
+    (err) => {
+        if (err.response?.status === 401) {
+            localStorage.removeItem("token");
+
+            if (typeof window !== "undefined") {
+                const currentPath = window.location.pathname;
+
+                if (currentPath !== "/auth") {
+                    window.location.href = "/auth";
+                }
+            }
+        }
+
+        return Promise.reject(err);
+    }
+);

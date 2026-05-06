@@ -31,7 +31,7 @@ export default function MyBooks() {
         <div className="p-5 w-full mx-auto h-full flex flex-col">
             <h1 className="text-2xl font-semibold mb-5">📚 My books</h1>
 
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-5 grid-rows-2 gap-4 flex-1">
                 {books.map((b) => (
                     <BookCard key={b.id} book={b} isOwner={b.ownerId === user?.id} />
                 ))}

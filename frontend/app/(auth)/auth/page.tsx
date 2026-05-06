@@ -15,9 +15,7 @@ const AuthPage = () => {
     const [isLogin, setIsLogin] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-
+    const handleLogin = async () => {
         if (!email || !password) {
             setError("Fill all fields before continue");
             return;
@@ -32,9 +30,7 @@ const AuthPage = () => {
         }
     };
 
-    const handleSignup = async (e: React.FormEvent) => {
-        e.preventDefault();
-
+    const handleSignup = async () => {
         if (!name || !email || !password) {
             setError("Fill all fields before continue");
             return;
@@ -99,7 +95,7 @@ const AuthPage = () => {
                     </button>
                 </p>
 
-                {error ?? <span className="text-red-400 text-sm animate-pulse">{error}</span>}
+                {error && <span className="text-red-400 text-sm animate-pulse">{error}</span>}
             </div>
         </div>
     );

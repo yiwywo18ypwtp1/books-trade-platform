@@ -40,8 +40,8 @@ export default function BooksPage() {
     const totalPages = Math.ceil(total / limit);
 
     return (
-        <div className="p-5 mx-auto h-full flex flex-col justify-between">
-            <div className="w-full">
+        <div className="p-5 mx-auto min-h-screen flex flex-col">
+            <div className="w-full flex-1 flex flex-col">
                 <h1 className="text-2xl font-semibold mb-5">📚 Books</h1>
 
                 <input
@@ -54,14 +54,14 @@ export default function BooksPage() {
                     className="border border-gray-300 px-3 py-2 rounded-full mb-4 w-full transition outline-0 focus:border-violet-400"
                 />
 
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-6 grid-rows-2 gap-4 flex-1">
                     {books.map((b) => (
                         <BookCard key={b.id} book={b} isOwner={b.ownerId === user?.id} />
                     ))}
                 </div>
             </div>
 
-            <div className="mt-5 flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                     <button
                         key={p}
