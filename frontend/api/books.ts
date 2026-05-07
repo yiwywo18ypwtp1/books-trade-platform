@@ -16,24 +16,11 @@ export const getBook = async (id: number) => {
     return data;
 };
 
-// export const getBookSSR = async (
-//     id: number,
-//     token?: string
-// ): Promise<Book> => {
-//     const res = await fetch(`${process.env.API_URL}/books/${id}`, {
-//         headers: token
-//             ? { cookie: `token=${token}` }
-//             : {},
-//         cache: "no-store",
-//     });
+export const getRelated = async (id: number) => {
+    const { data } = await api.get(`/books/${id}/related`);
 
-//     if (!res.ok) {
-//         const text = await res.text();
-//         throw new Error(`Failed to fetch book: ${res.status} - ${text}`);
-//     }
-
-//     return res.json();
-// };
+    return data
+}
 
 export const createBook = async (payload: { name: string; author: string; photoUrl?: string; }) => {
     const { data } = await api.post<Book>("/books", payload);

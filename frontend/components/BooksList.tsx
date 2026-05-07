@@ -20,6 +20,7 @@ export const BookList = ({ books, onEdit, onDelete, userId }: Props) => {
                     isOwner={b.ownerId === userId}
                     onEdit={() => onEdit?.(b)}
                     onDelete={() => onDelete?.(b.id)}
+                    variant="grid"
                 />
             ))}
         </div>

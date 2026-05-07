@@ -40,6 +40,18 @@ export const getBook = async (req: Request, res: Response) => {
     }
 };
 
+export const getRelatedBooks = async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+
+        const result = await service.getRelated(id);
+
+        res.json(result);
+    } catch (err: any) {
+        res.status(err.status || 500).json({ message: err.message });
+    }
+};
+
 export const updateBook = async (req: Request<{ id: string }, {}, BookUpdate>, res: Response) => {
     try {
         const user = (req as any).user;

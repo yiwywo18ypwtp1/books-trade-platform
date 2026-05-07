@@ -64,6 +64,28 @@ export const getOne = async (id: number) => {
     return book;
 };
 
+export const getRelated = async (bookId: number) => {
+    const book = await prisma.book.findUnique({
+        where: { id: bookId }
+    });
+
+    if (!book) {
+        throw { status: 404, message: "Book not found" };
+    }
+
+    return prisma.book.findMany({
+        where: {
+            author: {
+                equals: book.author,
+                mode: "insensitive"
+            },
+            NOT: {
+                id: book.id
+            }
+        },
+    });
+};
+
 export const update = async (id: number, userId: number, role: string, data: BookUpdate) => {
     const book = await prisma.book.findUnique({ where: { id } });
 

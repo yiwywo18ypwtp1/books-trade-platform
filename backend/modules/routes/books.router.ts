@@ -13,5 +13,6 @@ router.patch("/:id", controller.updateBook);
 router.delete("/:id", controller.deleteBook);
 
 router.post("/:id/send-request", controller.sendRequest);
+router.get("/:id/related", controller.getRelatedBooks);
 
 export default router;
