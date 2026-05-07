@@ -16,24 +16,24 @@ export const getBook = async (id: number) => {
     return data;
 };
 
-export const getBookSSR = async (
-    id: number,
-    token?: string
-): Promise<Book> => {
-    const res = await fetch(`${process.env.API_URL}/books/${id}`, {
-        headers: token
-            ? { cookie: `token=${token}` }
-            : {},
-        cache: "no-store",
-    });
+// export const getBookSSR = async (
+//     id: number,
+//     token?: string
+// ): Promise<Book> => {
+//     const res = await fetch(`${process.env.API_URL}/books/${id}`, {
+//         headers: token
+//             ? { cookie: `token=${token}` }
+//             : {},
+//         cache: "no-store",
+//     });
 
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Failed to fetch book: ${res.status} - ${text}`);
-    }
+//     if (!res.ok) {
+//         const text = await res.text();
+//         throw new Error(`Failed to fetch book: ${res.status} - ${text}`);
+//     }
 
-    return res.json();
-};
+//     return res.json();
+// };
 
 export const createBook = async (payload: { name: string; author: string; photoUrl?: string; }) => {
     const { data } = await api.post<Book>("/books", payload);

@@ -1,15 +1,23 @@
-import { cookies } from "next/headers";
+"use client";
 
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
+import { getBook } from "@/api/books";
 import { Book } from "@/types/book";
-import { getBookSSR } from "@/api/books";
 import ExchangeButton from "@/components/ExchangeButton";
 
-export default async function BookPage({ params }: { params: { id: string }; }) {
-    const { id } = await params;
+export default function BookPage() {
+    const { id } = useParams();
+    const [book, setBook] = useState<Book | null>(null);
 
-    const token = (await cookies()).get("token")?.value;
+    useEffect(() => {
+        if (!id) return;
 
-    const book: Book = await getBookSSR(Number(id), token);
+        getBook(Number(id)).then(setBook);
+    }, [id]);
+
+    if (!book) return <div>Loading...</div>;
 
     return (
         <div className="w-full h-full flex-1 flex items-center justify-center flex-col gap-8">
