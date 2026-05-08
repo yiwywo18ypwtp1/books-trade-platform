@@ -5,13 +5,18 @@ import { useEffect, useState } from "react";
 import { deleteBook, getBooks, updateBook } from "@/api/books";
 import { Book } from "@/types/book";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useAuth } from "@/hooks/useAuth";
 import BookList from "@/components/BooksList";
 import EditBookModal from "@/components/EditBookModal";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { User } from "@/types/user";
+import { createApi } from "@/lib/createApi";
+import { getMe } from "@/api/auth";
 
 export default function BooksPage() {
-    const { user } = useAuth()
+    const { user, isLoaded } = useUser()
+    const { getToken } = useAuth();
 
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [books, setBooks] = useState<Book[]>([]);
     const [editingBook, setEditingBook] = useState<Book | null>(null);
 
@@ -23,6 +28,18 @@ export default function BooksPage() {
 
     const limit = 12;
 
+    const getApi = async () => {
+        const token = await getToken({
+            template: "backend",
+        });
+
+        if (!token) {
+            throw new Error("Unauthorized");
+        }
+
+        return createApi(token);
+    };
+
     const fetchBooks = async () => {
         const res = await getBooks(page, limit, debouncedSearch);
 
@@ -30,9 +47,16 @@ export default function BooksPage() {
         setTotal(res.meta.total);
     };
 
-    useEffect(() => {
-        fetchBooks();
-    }, [page, limit, debouncedSearch]);
+    const fetchCurrentUser = async () => {
+        try {
+            const res = await getMe(await getApi());
+
+            setCurrentUser(res);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
 
     const totalPages = Math.ceil(total / limit);
 
@@ -40,13 +64,18 @@ export default function BooksPage() {
         setBooks((prev) => prev.filter((b) => b.id !== id));
 
         try {
-            await deleteBook(id);
+            await deleteBook(await getApi(), id);
         } catch (err) {
             console.error(err);
 
             await fetchBooks();
         }
     };
+
+    useEffect(() => {
+        fetchCurrentUser();
+        fetchBooks();
+    }, [page, limit, debouncedSearch]);
 
     return (
         <div className="p-5 mx-auto min-h-screen flex flex-col">
@@ -65,7 +94,7 @@ export default function BooksPage() {
 
                 <BookList
                     books={books}
-                    userId={user?.id}
+                    userId={currentUser?.id}
                     onEdit={(b) => setEditingBook(b)}
                     onDelete={handleDelete}
                 />
@@ -91,7 +120,7 @@ export default function BooksPage() {
                     book={editingBook}
                     onClose={() => setEditingBook(null)}
                     onSave={async (data) => {
-                        await updateBook(editingBook.id, data);
+                        await updateBook(await getApi(), editingBook.id, data);
                         await fetchBooks();
                     }}
                 />

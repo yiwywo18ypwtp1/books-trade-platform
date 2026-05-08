@@ -14,7 +14,7 @@ type CardProps = {
 };
 
 export default function BookCard({ book, isOwner, onEdit, onDelete, variant }: CardProps) {
-    const base = "flex flex-col border border-gray-300 rounded-lg p-3 bg-white shadow-lg transition hover:shadow-none hover:border-gray-400";
+    const base = "flex flex-col justify-between border border-gray-300 rounded-lg p-3 bg-white shadow-lg transition hover:shadow-none hover:border-gray-400";
 
     const sizes =
         variant === "row"

@@ -7,6 +7,7 @@ import usersRouter from "./modules/routes/users.router"
 import meRouter from "./modules/routes/me.router";
 import authRouter from "./modules/routes/auth.router"
 import booksRouter from "./modules/routes/books.router"
+import { clerkExpressMiddleware } from "./middlewares/clerkAuth";
 
 
 
@@ -25,6 +26,8 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(clerkExpressMiddleware);
 
 app.use("/admin/users", usersRouter)
 

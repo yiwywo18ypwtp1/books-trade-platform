@@ -1,14 +1,19 @@
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { createBook } from "@/api/books"
+import { getToken, useUser } from "@clerk/nextjs";
+import { createApi } from "@/lib/createApi";
+import { User } from "@/types/user";
+import { getMe } from "@/api/auth";
 
 const AddBook = () => {
     const router = useRouter();
-    const { user, loading } = useAuth();
+    const { user, isLoaded } = useUser();
+
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
 
     const [name, setName] = useState<string>("");
     const [author, setAuthor] = useState<string>("");
@@ -16,8 +21,30 @@ const AddBook = () => {
 
     const [error, setError] = useState<string>("");
 
+    const getApi = async () => {
+        const token = await getToken({
+            template: "backend",
+        });
+
+        if (!token) {
+            throw new Error("Unauthorized");
+        }
+
+        return createApi(token);
+    };
+
+    const fetchCurrentUser = async () => {
+        try {
+            const res = await getMe(await getApi());
+
+            setCurrentUser(res);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const handleAdd = async () => {
-        if (loading) return;
+        if (!isLoaded) return;
 
         if (!user) {
             router.push("/auth");
@@ -25,13 +52,17 @@ const AddBook = () => {
         }
 
         try {
-            await createBook({ name: name, author: author || user.name, photoUrl: photoUrl });
+            await createBook(await getApi(), { name: name, author: author || currentUser?.name || "Unknown", photoUrl: photoUrl });
 
             router.push("/me/books");
         } catch (err: any) {
             setError(err.message);
         }
     };
+
+    useEffect(() => {
+        fetchCurrentUser();
+    }, [isLoaded, user])
 
     return (
         <div className="w-full h-full flex-1 flex items-center justify-center flex-col gap-8">

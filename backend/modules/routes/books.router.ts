@@ -1,18 +1,16 @@
 import { Router } from "express";
 import * as controller from "../controllers/books.controller";
-import { authMiddleware } from "../../middlewares/JWTAuth";
+import { authMiddleware } from "../../middlewares/clerkAuth";
 
 const router = Router();
 
-router.use(authMiddleware);
-
 router.get("/", controller.getBooks);
-router.post("/", controller.createBook);
+router.post("/", authMiddleware, controller.createBook);
 router.get("/:id", controller.getBook);
-router.patch("/:id", controller.updateBook);
-router.delete("/:id", controller.deleteBook);
+router.patch("/:id", authMiddleware, controller.updateBook);
+router.delete("/:id", authMiddleware, controller.deleteBook);
 
-router.post("/:id/send-request", controller.sendRequest);
+router.post("/:id/send-request", authMiddleware, controller.sendRequest);
 router.get("/:id/related", controller.getRelatedBooks);
 
 export default router;

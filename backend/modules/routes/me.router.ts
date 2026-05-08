@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authMiddleware } from "../../middlewares/JWTAuth";
+import { authMiddleware } from "../../middlewares/clerkAuth";
 import * as controller from "../controllers/books.controller";
 
 const router = Router();

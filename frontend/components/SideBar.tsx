@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, Library, PlusCircle, BookUser } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useUser, SignOutButton, Show, UserButton } from "@clerk/nextjs";
 
 const NAV = [
     {
@@ -26,7 +26,7 @@ const NAV = [
 const SideBar = () => {
     const pathname = usePathname();
 
-    const { user, logout } = useAuth();
+    const { user } = useUser();
 
     return (
         <div className="w-64 h-screen border-r border-gray-400 p-4 flex flex-col justify-between">
@@ -55,10 +55,11 @@ const SideBar = () => {
                 </nav>
             </div>
 
-            {user && <div className="flex flex-col items-center justify-centerw-full">
-                <span>{user.email}</span>
-                <button onClick={logout} className="text-sm text-gray-500 underline hover:text-violet-400 cursor-pointer transition">Logout</button>
-            </div>}
+            <div className="flex flex-col items-center justify-center">
+                <Show when="signed-in">
+                    <UserButton />
+                </Show>
+            </div>
         </div>
     );
 }

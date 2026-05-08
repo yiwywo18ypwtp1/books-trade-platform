@@ -4,38 +4,65 @@ import { useEffect, useState } from "react";
 
 import { deleteBook, getMyBooks, updateBook } from "@/api/books";
 import { Book } from "@/types/book";
-import { useAuth } from "@/hooks/useAuth";
 import BookList from "@/components/BooksList";
 import EditBookModal from "@/components/EditBookModal";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { createApi } from "@/lib/createApi";
+import { User } from "@/types/user";
+import { getMe } from "@/api/auth";
 
 export default function MyBooks() {
-    const { user, loading } = useAuth();
+    const { user, isLoaded } = useUser();
+    const { getToken } = useAuth();
 
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [books, setBooks] = useState<Book[]>([]);
     const [editingBook, setEditingBook] = useState<Book | null>(null);
 
+    const getApi = async () => {
+        const token = await getToken({
+            template: "backend",
+        });
+
+        if (!token) {
+            throw new Error("Unauthorized");
+        }
+
+        return createApi(token);
+    };
+
     const fetchBooks = async () => {
-        const res = await getMyBooks();
+        const res = await getMyBooks(await getApi());
 
         setBooks(res);
     };
-
-    useEffect(() => {
-        if (!user) return;
-        fetchBooks();
-    }, [loading, user]);
 
     const handleDelete = async (id: number) => {
         setBooks((prev) => prev.filter((b) => b.id !== id));
 
         try {
-            await deleteBook(id);
+            await deleteBook(await getApi(), id);
         } catch (err) {
             console.error(err);
-
-            await fetchBooks();
         }
     };
+
+    const fetchCurrentUser = async () => {
+        try {
+            const res = await getMe(await getApi());
+
+            setCurrentUser(res);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    useEffect(() => {
+        if (!isLoaded || !user) return;
+
+        fetchCurrentUser();
+        fetchBooks();
+    }, [isLoaded, user]);
 
     return (
         <div className="p-5 w-full mx-auto h-full flex flex-col">
@@ -43,7 +70,7 @@ export default function MyBooks() {
 
             <BookList
                 books={books}
-                userId={user?.id}
+                userId={(currentUser?.id)}
                 onEdit={(b) => setEditingBook(b)}
                 onDelete={handleDelete}
             />
@@ -53,7 +80,7 @@ export default function MyBooks() {
                     book={editingBook}
                     onClose={() => setEditingBook(null)}
                     onSave={async (data) => {
-                        await updateBook(editingBook.id, data);
+                        await updateBook(await getApi(), editingBook.id, data);
                         await fetchBooks();
                     }}
                 />

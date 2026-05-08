@@ -7,6 +7,8 @@ import { getBook, getRelated } from "@/api/books";
 import { Book } from "@/types/book";
 import ExchangeButton from "@/components/ExchangeButton";
 import BookCard from "@/components/BookCard";
+import { createApi } from "@/lib/createApi";
+import { getToken } from "@clerk/nextjs";
 
 export default function BookPage() {
     const { id } = useParams();
@@ -14,11 +16,34 @@ export default function BookPage() {
 
     const [related, setRelated] = useState<Book[]>([]);
 
-    useEffect(() => {
-        if (!id) return;
+    const getApi = async () => {
+        const token = await getToken({
+            template: "backend",
+        });
 
-        getBook(Number(id)).then(setBook);
-        getRelated(Number(id)).then(setRelated);
+        if (!token) {
+            throw new Error("Unauthorized");
+        }
+
+        return createApi(token);
+    };
+
+    const fetchBooks = async () => {
+        try {
+            if (!id) return;
+
+            const book = await getBook(await getApi(), Number(id));
+            const related = await getRelated(await getApi(), Number(id));
+
+            setBook(book);
+            setRelated(related);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    useEffect(() => {
+        fetchBooks();
     }, [id]);
 
     if (!book) return <div>Loading...</div>;
