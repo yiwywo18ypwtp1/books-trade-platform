@@ -102,12 +102,14 @@ export const getMyBooks = async (req: Request, res: Response) => {
 export const sendRequest = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
+        const offeredId = req.body.offeredId
 
         const user = (req as any).user;
         const message = req.body.message
 
         const result = await service.exchangeRequest(
             id,
+            offeredId,
             user.id,
             message
         );

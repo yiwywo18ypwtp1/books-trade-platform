@@ -5,16 +5,24 @@ import { useEffect, useState } from "react";
 
 import { getBook, getRelated } from "@/api/books";
 import { Book } from "@/types/book";
-import ExchangeButton from "@/components/ExchangeButton";
-import BookCard from "@/components/BookCard";
 import { createApi } from "@/lib/createApi";
-import { getToken } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
+import BooksRow from "@/components/BooksRow";
+import RequestModal from "@/components/RequestModal";
+import { getMe } from "@/api/auth";
+import { User } from "@/types/user";
 
 export default function BookPage() {
     const { id } = useParams();
-    const [book, setBook] = useState<Book | null>(null);
+    const { user, isLoaded } = useUser();
+    const { getToken } = useAuth();
 
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const [book, setBook] = useState<Book | null>(null);
     const [related, setRelated] = useState<Book[]>([]);
+
+    const [selected, setSelected] = useState<number | null>(null);
+    const [isOpened, setIsOpened] = useState<boolean>(false);
 
     const getApi = async () => {
         const token = await getToken({
@@ -32,8 +40,8 @@ export default function BookPage() {
         try {
             if (!id) return;
 
-            const book = await getBook(await getApi(), Number(id));
-            const related = await getRelated(await getApi(), Number(id));
+            const book = await getBook(Number(id));
+            const related = await getRelated(Number(id));
 
             setBook(book);
             setRelated(related);
@@ -42,11 +50,23 @@ export default function BookPage() {
         }
     }
 
+    const fetchCurrentUser = async () => {
+        try {
+            const res = await getMe(await getApi());
+
+            setCurrentUser(res);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     useEffect(() => {
+        fetchCurrentUser();
         fetchBooks();
-    }, [id]);
+    }, [user, isLoaded])
 
     if (!book) return <div>Loading...</div>;
+    if (!user) return <div>Loading...</div>;
 
     const filteredRelated = related.filter(el => el.id !== book.id)
 
@@ -63,7 +83,12 @@ export default function BookPage() {
                                 />
                             </div>
 
-                            <ExchangeButton bookId={book.id} />
+                            {currentUser?.id !== book.ownerId && <button
+                                onClick={() => setIsOpened(true)}
+                                className="bg-violet-500 py-2 text-white rounded-md hover:bg-violet-600 cursor-pointer transition"
+                            >
+                                Offer exchange
+                            </button>}
                         </div>
 
                         <div className="flex flex-col text-xl">
@@ -72,25 +97,21 @@ export default function BookPage() {
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-1 min-h-80 overflow-hidden">
-                        <h1 className="text-xl font-semibold">More books from this author:</h1>
-
-                        <div className="p-4 h-full bg-gray-100 border border-gray-200 rounded-xl overflow-hidden">
-                            {filteredRelated.length > 0 ? (
-                                <div className="flex gap-4 min-h-fit h-full overflow-x-auto w-full overflow-y-visible">
-                                    {filteredRelated.map(b => (
-                                        <BookCard
-                                            key={b.id}
-                                            book={b}
-                                            variant="row"
-                                        />
-                                    ))}
-                                </div>
-                            ) : <span className="flex items-center justify-center h-full text-gray-500">This author has no other books</span>}
-                        </div>
-                    </div>
+                    <BooksRow title="More books from this author:" books={filteredRelated} cardType="link" />
                 </div>
             </div>
+
+            {isOpened &&
+                <RequestModal
+                    targetId={Number(id)}
+                    selected={selected}
+                    setSelected={setSelected}
+                    onClose={() => {
+                        setIsOpened(false);
+                        setSelected(null)
+                    }}
+                />
+            }
         </div>
     );
 }

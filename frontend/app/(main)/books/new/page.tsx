@@ -8,10 +8,13 @@ import { getToken, useUser } from "@clerk/nextjs";
 import { createApi } from "@/lib/createApi";
 import { User } from "@/types/user";
 import { getMe } from "@/api/auth";
+import { useAlert } from "@/providers/AlertProvider";
 
 const AddBook = () => {
     const router = useRouter();
+
     const { user, isLoaded } = useUser();
+    const { addAlert } = useAlert();
 
     const [currentUser, setCurrentUser] = useState<User | null>(null);
 
@@ -44,7 +47,11 @@ const AddBook = () => {
     };
 
     const handleAdd = async () => {
-        if (!isLoaded) return;
+        if (!isLoaded) {
+            addAlert("Fill book name before", "error");
+
+            return;
+        }
 
         if (!user) {
             router.push("/auth");
@@ -54,6 +61,7 @@ const AddBook = () => {
         try {
             await createBook(await getApi(), { name: name, author: author || currentUser?.name || "Unknown", photoUrl: photoUrl });
 
+            addAlert("Book added successfully", "success");
             router.push("/me/books");
         } catch (err: any) {
             setError(err.message);
@@ -62,7 +70,9 @@ const AddBook = () => {
 
     useEffect(() => {
         fetchCurrentUser();
-    }, [isLoaded, user])
+    }, [isLoaded, user]);
+
+    if (!user) return <div>Loading...</div>;
 
     return (
         <div className="w-full h-full flex-1 flex items-center justify-center flex-col gap-8">

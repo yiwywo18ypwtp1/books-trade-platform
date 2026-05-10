@@ -13,13 +13,13 @@ export const getBooks = async (page = 1, limit = 10, search = "") => {
     return data;
 };
 
-export const getBook = async (api: AxiosInstance, id: number) => {
+export const getBook = async (id: number) => {
     const { data } = await api.get<Book>(`/books/${id}`);
 
     return data;
 };
 
-export const getRelated = async (api: AxiosInstance, id: number) => {
+export const getRelated = async (id: number) => {
     const { data } = await api.get(`/books/${id}/related`);
 
     return data
@@ -43,10 +43,13 @@ export const deleteBook = async (api: AxiosInstance, id: number) => {
     return data;
 };
 
-export const sendExchangeRequest = async (api: AxiosInstance, id: number, message?: string) => {
+export const sendExchangeRequest = async (api: AxiosInstance, id: number, offeredId: number, message?: string) => {
     const { data } = await api.post(
         `/books/${id}/send-request`,
-        { message }
+        {
+            offeredId,
+            message,
+        }
     );
 
     return data;

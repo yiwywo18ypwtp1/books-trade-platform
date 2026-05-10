@@ -3,30 +3,44 @@
 import { Trash, Pencil } from "lucide-react";
 
 import { Book } from "@/types/book";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type CardProps = {
     book: Book;
     isOwner?: boolean;
     onEdit?: (book: Book) => void;
     onDelete?: (id: number) => void;
+    selected?: number | null;
+    setSelected?: (id: number) => void;
     variant?: "grid" | "row";
+    type: "link" | "button";
 };
 
-export default function BookCard({ book, isOwner, onEdit, onDelete, variant }: CardProps) {
-    const base = "flex flex-col justify-between border border-gray-300 rounded-lg p-3 bg-white shadow-lg transition hover:shadow-none hover:border-gray-400";
+export default function BookCard({ book, isOwner, onEdit, onDelete, selected, setSelected, variant, type }: CardProps) {
+    const router = useRouter();
+
+    const base = "flex flex-col justify-between border border-gray-300 rounded-lg p-3 bg-white shadow-lg transition hover:shadow-none hover:border-gray-400 cursor-pointer";
 
     const sizes =
         variant === "row"
             ? "min-w-[160px] max-w-[180px] flex-shrink-0 hover:scale-97"
             : "w-full hover:translate-y-1";
 
+    const border =
+        selected === book.id
+            ? "border-violet-500 scale-97 shadow-none"
+            : "border-gray-300"
+
     return (
-        <Link
-            href={`/books/${book.id}`}
-            className={`${base} ${sizes}`}
+        <div
+            onClick={type === "link"
+                ? (() => router.push(`/books/${book.id}`)
+                ) : () => {
+                    setSelected?.(book.id)
+                }}
+            className={`${base} ${sizes} ${selected ? border : ""}`}
         >
-            <div className="w-full aspect-[3/4] mb-2">
+            <div className="w-full aspect-3/4 mb-2">
                 <img
                     src={book.photoUrl || "https://via.placeholder.com/150"}
                     className="w-full h-full object-cover rounded border border-gray-200"
@@ -66,6 +80,6 @@ export default function BookCard({ book, isOwner, onEdit, onDelete, variant }: C
                     </div>
                 )}
             </div>
-        </Link>
+        </div >
     );
 }

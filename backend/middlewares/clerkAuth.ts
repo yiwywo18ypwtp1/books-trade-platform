@@ -1,16 +1,20 @@
 import { Request, Response, NextFunction } from "express";
-import { clerkMiddleware, getAuth } from "@clerk/express";
+import { clerkMiddleware, getAuth, clerkClient } from "@clerk/express";
 import { prisma } from "../db";
 
 export const clerkExpressMiddleware = clerkMiddleware();
 
-export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const auth = getAuth(req);
 
         if (!auth.userId) {
             return res.status(401).json({
-                message: "Unauthorized"
+                message: "Unauthorized",
             });
         }
 
@@ -23,11 +27,19 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         });
 
         if (!user) {
+            const clerkUser = await clerkClient.users.getUser(clerkId);
+
+            const email =
+                clerkUser.emailAddresses[0]?.emailAddress;
+
             user = await prisma.user.create({
                 data: {
                     clerkId,
-                    email: `${clerkId}@temp.local`,
-                    name: "User",
+                    email,
+                    name:
+                        clerkUser.firstName ||
+                        clerkUser.username ||
+                        "User",
                     password: "",
                 },
             });

@@ -122,7 +122,7 @@ export const getMy = async (userId: number) => {
     });
 };
 
-export const exchangeRequest = async (id: number, userId: number, message?: string) => {
+export const exchangeRequest = async (id: number, offeredId: number, userId: number, message?: string) => {
     const book = await prisma.book.findUnique({
         where: { id },
         include: {
@@ -132,9 +132,10 @@ export const exchangeRequest = async (id: number, userId: number, message?: stri
         }
     });
 
-    const senderBooks = await prisma.book.findMany({ where: { ownerId: userId } });
+    const senderBook = await prisma.book.findUnique({ where: { id: offeredId } });
 
     if (!book) throw new HttpError("Book not found", 404);
+    if (!senderBook) throw new HttpError("Sender Book not found", 404);
 
     if (book.ownerId == userId) {
         throw new HttpError("You can't send a request to urself", 400);
@@ -155,7 +156,7 @@ export const exchangeRequest = async (id: number, userId: number, message?: stri
 
     let finalMessage = message ?? "Hey! I want to exchange books with you 📚";
 
-    const template = html(sender, receiver, senderBooks, finalMessage);
+    const template = html(sender, receiver, senderBook, finalMessage);
 
     await sendMail(receiver.email, "Book exchange request", finalMessage, template);
 

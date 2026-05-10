@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Book } from "@/types/book";
+import { useAlert } from "@/providers/AlertProvider";
 
 type Props = {
     book: Book;
@@ -14,6 +15,8 @@ type Props = {
 };
 
 const EditBookModal = ({ book, onClose, onSave }: Props) => {
+    const { addAlert } = useAlert();
+
     const [name, setName] = useState(book.name);
     const [author, setAuthor] = useState(book.author);
     const [photoUrl, setPhotoUrl] = useState(book.photoUrl ?? "");
@@ -21,17 +24,24 @@ const EditBookModal = ({ book, onClose, onSave }: Props) => {
 
     useEffect(() => {
         document.body.style.overflow = "hidden";
+
         return () => {
             document.body.style.overflow = "auto";
         };
     }, []);
 
     const handleSave = async () => {
-        if (!name.trim()) return;
+        if (!name.trim()) {
+            addAlert("Fill book name before saving!", "error");
+
+            return;
+        }
 
         try {
             setLoading(true);
             await onSave({ name, author, photoUrl });
+
+            addAlert("Book updated successfully", "success");
             onClose();
         } finally {
             setLoading(false);

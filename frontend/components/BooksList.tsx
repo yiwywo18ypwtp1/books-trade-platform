@@ -21,6 +21,7 @@ export const BookList = ({ books, onEdit, onDelete, userId }: Props) => {
                     onEdit={() => onEdit?.(b)}
                     onDelete={() => onDelete?.(b.id)}
                     variant="grid"
+                    type="link"
                 />
             ))}
         </div>

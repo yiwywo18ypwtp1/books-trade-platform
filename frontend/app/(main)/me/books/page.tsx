@@ -10,10 +10,13 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { createApi } from "@/lib/createApi";
 import { User } from "@/types/user";
 import { getMe } from "@/api/auth";
+import { useAlert } from "@/providers/AlertProvider";
 
 export default function MyBooks() {
     const { user, isLoaded } = useUser();
     const { getToken } = useAuth();
+
+    const { addAlert } = useAlert();
 
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [books, setBooks] = useState<Book[]>([]);
@@ -42,6 +45,8 @@ export default function MyBooks() {
 
         try {
             await deleteBook(await getApi(), id);
+
+            addAlert("Book deleted successfully", "success");
         } catch (err) {
             console.error(err);
         }
@@ -63,6 +68,9 @@ export default function MyBooks() {
         fetchCurrentUser();
         fetchBooks();
     }, [isLoaded, user]);
+
+    if (!books) return <div>Loading...</div>;
+    if (!user) return <div>Loading...</div>;
 
     return (
         <div className="p-5 w-full mx-auto h-full flex flex-col">
