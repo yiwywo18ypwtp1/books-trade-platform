@@ -17,10 +17,11 @@ type Props = {
 const EditBookModal = ({ book, onClose, onSave }: Props) => {
     const { addAlert } = useAlert();
 
-    const [name, setName] = useState(book.name);
-    const [author, setAuthor] = useState(book.author);
-    const [photoUrl, setPhotoUrl] = useState(book.photoUrl ?? "");
-    const [loading, setLoading] = useState(false);
+    const [name, setName] = useState<string>(book.name);
+    const [author, setAuthor] = useState<string>(book.author);
+    const [photoUrl, setPhotoUrl] = useState<string>(book.photoUrl ?? "");
+
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         document.body.style.overflow = "hidden";

@@ -6,33 +6,18 @@ import { deleteBook, getMyBooks, updateBook } from "@/api/books";
 import { Book } from "@/types/book";
 import BookList from "@/components/BooksList";
 import EditBookModal from "@/components/EditBookModal";
-import { useAuth, useUser } from "@clerk/nextjs";
-import { createApi } from "@/lib/createApi";
-import { User } from "@/types/user";
-import { getMe } from "@/api/auth";
 import { useAlert } from "@/providers/AlertProvider";
+import { useApi } from "@/hooks/useApi";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export default function MyBooks() {
-    const { user, isLoaded } = useUser();
-    const { getToken } = useAuth();
+    const { getApi } = useApi();
+    const { currentUser, loading } = useCurrentUser();
 
-    const { addAlert } = useAlert();
-
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [books, setBooks] = useState<Book[]>([]);
     const [editingBook, setEditingBook] = useState<Book | null>(null);
 
-    const getApi = async () => {
-        const token = await getToken({
-            template: "backend",
-        });
-
-        if (!token) {
-            throw new Error("Unauthorized");
-        }
-
-        return createApi(token);
-    };
+    const { addAlert } = useAlert();
 
     const fetchBooks = async () => {
         const res = await getMyBooks(await getApi());
@@ -52,25 +37,14 @@ export default function MyBooks() {
         }
     };
 
-    const fetchCurrentUser = async () => {
-        try {
-            const res = await getMe(await getApi());
-
-            setCurrentUser(res);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
     useEffect(() => {
-        if (!isLoaded || !user) return;
+        if (loading || !currentUser) return;
 
-        fetchCurrentUser();
         fetchBooks();
-    }, [isLoaded, user]);
+    }, [loading, currentUser]);
 
     if (!books) return <div>Loading...</div>;
-    if (!user) return <div>Loading...</div>;
+    if (!currentUser) return <div>Loading...</div>;
 
     return (
         <div className="p-5 w-full mx-auto h-full flex flex-col">

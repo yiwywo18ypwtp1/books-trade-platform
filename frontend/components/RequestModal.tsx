@@ -8,6 +8,8 @@ import { Book } from "@/types/book";
 import BooksRow from "./BooksRow";
 import { useAlert } from "@/providers/AlertProvider";
 import { ArrowDownUp } from "lucide-react";
+import { useApi } from "@/hooks/useApi";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 type Props = {
     targetId: number;
@@ -17,25 +19,13 @@ type Props = {
 }
 
 const RequestModal = ({ targetId, selected, setSelected, onClose }: Props) => {
-    const { user, isLoaded } = useUser();
-    const { getToken } = useAuth();
-
     const { addAlert } = useAlert();
 
     const [books, setBooks] = useState<Book[]>([]);
     const [message, setMessage] = useState<string>("");
 
-    const getApi = async () => {
-        const token = await getToken({
-            template: "backend",
-        });
-
-        if (!token) {
-            throw new Error("Unauthorized");
-        }
-
-        return createApi(token);
-    };
+    const { getApi } = useApi();
+    const { currentUser, loading } = useCurrentUser();
 
     const handleSend = async () => {
         if (!selected) {
@@ -56,10 +46,10 @@ const RequestModal = ({ targetId, selected, setSelected, onClose }: Props) => {
     };
 
     useEffect(() => {
-        if (!isLoaded || !user) return;
+        if (loading || !currentUser) return;
 
         fetchBooks();
-    }, [isLoaded, user]);
+    }, [loading, currentUser]);
 
     return (
         <div className="fixed inset-0 bg-black/50 border flex flex-col items-center jsutify-center gap-1 overflow-hidden z-50">

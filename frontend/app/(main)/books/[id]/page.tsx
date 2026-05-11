@@ -5,36 +5,20 @@ import { useEffect, useState } from "react";
 
 import { getBook, getRelated } from "@/api/books";
 import { Book } from "@/types/book";
-import { createApi } from "@/lib/createApi";
-import { useAuth, useUser } from "@clerk/nextjs";
 import BooksRow from "@/components/BooksRow";
 import RequestModal from "@/components/RequestModal";
-import { getMe } from "@/api/auth";
-import { User } from "@/types/user";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export default function BookPage() {
     const { id } = useParams();
-    const { user, isLoaded } = useUser();
-    const { getToken } = useAuth();
 
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const { currentUser } = useCurrentUser();
+
     const [book, setBook] = useState<Book | null>(null);
     const [related, setRelated] = useState<Book[]>([]);
 
     const [selected, setSelected] = useState<number | null>(null);
     const [isOpened, setIsOpened] = useState<boolean>(false);
-
-    const getApi = async () => {
-        const token = await getToken({
-            template: "backend",
-        });
-
-        if (!token) {
-            throw new Error("Unauthorized");
-        }
-
-        return createApi(token);
-    };
 
     const fetchBooks = async () => {
         try {
@@ -45,30 +29,20 @@ export default function BookPage() {
 
             setBook(book);
             setRelated(related);
+
+
         } catch (err) {
             console.error(err);
         }
     }
 
-    const fetchCurrentUser = async () => {
-        try {
-            const res = await getMe(await getApi());
-
-            setCurrentUser(res);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
     useEffect(() => {
-        fetchCurrentUser();
         fetchBooks();
-    }, [user, isLoaded])
+    }, [id])
 
     if (!book) return <div>Loading...</div>;
-    if (!user) return <div>Loading...</div>;
 
-    const filteredRelated = related.filter(el => el.id !== book.id)
+    const filteredRelated = related.filter(el => el.id !== book.id);
 
     return (
         <div className="w-full h-full flex-1 flex items-center justify-center flex-col gap-8">

@@ -1,22 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { createBook } from "@/api/books"
-import { getToken, useUser } from "@clerk/nextjs";
-import { createApi } from "@/lib/createApi";
-import { User } from "@/types/user";
-import { getMe } from "@/api/auth";
 import { useAlert } from "@/providers/AlertProvider";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useApi } from "@/hooks/useApi";
 
 const AddBook = () => {
     const router = useRouter();
 
-    const { user, isLoaded } = useUser();
     const { addAlert } = useAlert();
 
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const { getApi } = useApi();
+    const { currentUser, loading } = useCurrentUser();
 
     const [name, setName] = useState<string>("");
     const [author, setAuthor] = useState<string>("");
@@ -24,36 +22,14 @@ const AddBook = () => {
 
     const [error, setError] = useState<string>("");
 
-    const getApi = async () => {
-        const token = await getToken({
-            template: "backend",
-        });
-
-        if (!token) {
-            throw new Error("Unauthorized");
-        }
-
-        return createApi(token);
-    };
-
-    const fetchCurrentUser = async () => {
-        try {
-            const res = await getMe(await getApi());
-
-            setCurrentUser(res);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
     const handleAdd = async () => {
-        if (!isLoaded) {
+        if (!loading) {
             addAlert("Fill book name before", "error");
 
             return;
         }
 
-        if (!user) {
+        if (!currentUser) {
             router.push("/auth");
             return;
         }
@@ -68,11 +44,7 @@ const AddBook = () => {
         }
     };
 
-    useEffect(() => {
-        fetchCurrentUser();
-    }, [isLoaded, user]);
-
-    if (!user) return <div>Loading...</div>;
+    if (!currentUser) return <div>Loading...</div>;
 
     return (
         <div className="w-full h-full flex-1 flex items-center justify-center flex-col gap-8">

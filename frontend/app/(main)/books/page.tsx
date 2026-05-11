@@ -7,18 +7,15 @@ import { Book } from "@/types/book";
 import { useDebounce } from "@/hooks/useDebounce";
 import BookList from "@/components/BooksList";
 import EditBookModal from "@/components/EditBookModal";
-import { useAuth, useUser } from "@clerk/nextjs";
-import { User } from "@/types/user";
-import { createApi } from "@/lib/createApi";
-import { getMe } from "@/api/auth";
+import { useApi } from "@/hooks/useApi";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export default function BooksPage() {
-    const { user, isLoaded } = useUser()
-    const { getToken } = useAuth();
-
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [books, setBooks] = useState<Book[]>([]);
     const [editingBook, setEditingBook] = useState<Book | null>(null);
+
+    const { getApi } = useApi();
+    const { currentUser } = useCurrentUser();
 
     const [page, setPage] = useState<number>(1);
     const [total, setTotal] = useState<number>(0);
@@ -28,35 +25,12 @@ export default function BooksPage() {
 
     const limit = 12;
 
-    const getApi = async () => {
-        const token = await getToken({
-            template: "backend",
-        });
-
-        if (!token) {
-            throw new Error("Unauthorized");
-        }
-
-        return createApi(token);
-    };
-
     const fetchBooks = async () => {
         const res = await getBooks(page, limit, debouncedSearch);
 
         setBooks(res.data);
         setTotal(res.meta.total);
     };
-
-    const fetchCurrentUser = async () => {
-        try {
-            const res = await getMe(await getApi());
-
-            setCurrentUser(res);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
 
     const totalPages = Math.ceil(total / limit);
 
@@ -73,7 +47,6 @@ export default function BooksPage() {
     };
 
     useEffect(() => {
-        fetchCurrentUser();
         fetchBooks();
     }, [page, limit, debouncedSearch]);
 

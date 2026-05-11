@@ -26,8 +26,6 @@ const NAV = [
 const SideBar = () => {
     const pathname = usePathname();
 
-    const { user } = useUser();
-
     return (
         <div className="w-64 h-screen border-r border-gray-400 p-4 flex flex-col justify-between">
             <div className="flex flex-col w-full">
