@@ -18,7 +18,7 @@ const AddBook = () => {
 
     const [name, setName] = useState<string>("");
     const [author, setAuthor] = useState<string>("");
-    const [photoUrl, setPhotoUrl] = useState<string>("");
+    const [photoUrl, setPhotoUrl] = useState<string>("https://placehold.net/600x800.png");
 
     const [error, setError] = useState<string>("");
 

@@ -42,7 +42,7 @@ export default function BookCard({ book, isOwner, onEdit, onDelete, selected, se
         >
             <div className="w-full aspect-3/4 mb-2">
                 <img
-                    src={book.photoUrl || "https://via.placeholder.com/150"}
+                    src={book.photoUrl || "https://placehold.net/600x800.png"}
                     className="w-full h-full object-cover rounded border border-gray-200"
                 />
             </div>

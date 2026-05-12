@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Library, PlusCircle, BookUser } from "lucide-react";
+import { BookOpen, Library, PlusCircle, BookUser, ArrowDownUp } from "lucide-react";
 import { useUser, SignOutButton, Show, UserButton } from "@clerk/nextjs";
 
 const NAV = [
@@ -15,6 +15,11 @@ const NAV = [
         label: "My Books",
         href: "/me/books",
         icon: BookUser,
+    },
+    {
+        label: "Trade offers",
+        href: "/trade-offers",
+        icon: ArrowDownUp,
     },
     {
         label: "Add Book",
