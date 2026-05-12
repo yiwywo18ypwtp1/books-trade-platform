@@ -7,6 +7,8 @@ import usersRouter from "./modules/routes/users.router"
 import meRouter from "./modules/routes/me.router";
 import authRouter from "./modules/routes/auth.router"
 import booksRouter from "./modules/routes/books.router"
+import requestsRouter from "./modules/routes/requests.router"
+
 import { clerkExpressMiddleware } from "./middlewares/clerkAuth";
 
 
@@ -35,6 +37,7 @@ app.use("/me", meRouter);
 
 app.use("/auth", authRouter);
 app.use("/books", booksRouter);
+app.use("/requests", requestsRouter);
 
 app.get("/", (req, res) => {
     res.json({ message: "API working" });

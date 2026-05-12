@@ -1,7 +1,7 @@
 import { prisma } from "../../db";
 
 import { BookCreate, BookUpdate } from "../../types/book";
-import { html } from "../../utils/exchangeRequestHTMLTemplate";
+import { htmlRequestSent } from "../../utils/exchangeRequestHTMLTemplate";
 import { HttpError } from "../../utils/HttpError";
 import { sendMail } from "./mail.service";
 
@@ -154,9 +154,9 @@ export const exchangeRequest = async (id: number, offeredId: number, userId: num
 
     if (!sender) throw new HttpError("Sender not found", 404);
 
-    let finalMessage = message ?? "Hey! I want to exchange books with you 📚";
+    let finalMessage = message?.trim() || "Hey! I want to exchange books with you 📚";
 
-    const template = html(sender, receiver, senderBook, finalMessage);
+    const template = htmlRequestSent(sender, receiver, senderBook, finalMessage);
 
     await sendMail(receiver.email, "Book exchange request", finalMessage, template);
 
@@ -166,6 +166,7 @@ export const exchangeRequest = async (id: number, offeredId: number, userId: num
             receiverId: receiver.id,
             bookId: book.id,
             message: finalMessage,
+            offeredBookId: offeredId,
         }
     });
 

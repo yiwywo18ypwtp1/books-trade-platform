@@ -1,7 +1,7 @@
 import { Book } from "../types/book";
 import { UserPublic } from "../types/user";
 
-export const html = (sender: UserPublic, receiver: UserPublic, senderBook: Book, message: string) => {
+export const htmlRequestSent = (sender: UserPublic, receiver: UserPublic, senderBook: Book, message: string) => {
     return `
         <div style="font-family: Arial, sans-serif; background:#f6f8fa; padding:20px;">
         <div style="max-width:600px; margin:0 auto; background:#ffffff; border-radius:10px; padding:20px;">
@@ -61,5 +61,25 @@ export const html = (sender: UserPublic, receiver: UserPublic, senderBook: Book,
         
         </div>
         </div>
+    `
+}
+
+export const htmlRequestAccepted = () => {
+    return `
+        Hey! Great news 📚✨
+
+        Your book exchange request has been accepted.
+
+        The owner agreed to exchange books with you. You can now contact each other and arrange the details of the exchange.
+    `
+}
+
+export const htmlRequestRejected = () => {
+    return `
+        Hey!
+
+        Unfortunately, your book exchange request was declined 😔
+
+        Don’t worry — there are still plenty of other books and exchange opportunities waiting for you on Books Trade 📚
     `
 }
